@@ -130,20 +130,22 @@ def latent_funs_cov(Z, kernel_list):
 
 ##   6.   ##############################################################################################################
 
-def latent_functions_prior(Q, lenghtscale=None, variance=None, input_dim=None):
-    if lenghtscale is None:
-        lenghtscale = np.random.rand(Q)
-    else:
-        lenghtscale = lenghtscale
-
+def latent_functions_prior(Q, lengthscale=None, variance=None, input_dim=None, kernel=None):
+    if lengthscale is None:
+        lengthscale = [np.random.rand(Q)]
+    
+    if kernel is None:
+        kernel = kern.RBF
     if variance is None:
-        variance = np.random.rand(Q)
-    else:
-        variance = variance
+        variance = [np.random.rand(Q)]
+
     kern_list = []
     for q in range(Q):
+        #Integral Kernel Prior
+        kern_q = kernel(input_dim=input_dim, lengthscale=lengthscale[q], variance=variance[q])
+        #kern_q = kern.Mix_Integral_(input_dim=input_dim, lengthscale=[10]*2, variance=1.0, name='integral kernel')# FRB\
         #######   RBF GP prior  #######
-        kern_q = kern.RBF(input_dim=input_dim, lengthscale=lenghtscale[q], variance=variance[q], name='rbf')# \
+        #kern_q = kern.RBF(input_dim=input_dim, lengthscale=lenghtscale[q], variance=variance[q], name='rbf')# \
         kern_q.name = 'kern_q'+str(q)
         kern_list.append(kern_q)
     return kern_list
